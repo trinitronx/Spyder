@@ -9,38 +9,6 @@ import re
 
 from html.parser import HTMLParser
 
-# Function timing stuff
-#from numpy import *
-#import time
-
-#times = array([])
-#def get_timing(func):
-#	def wrapper(*arg):
-#		global times
-#		t1 = time.time()                                  
-#		res = func(*arg)
-#		t2 = time.time()
-#		times = append(times, (t2-t1)*1000.0 )
-		#print( '%s took %0.3f ms' % (func.__name__, (t2-t1)*1000.0) )
-#		return res
-#	return wrapper
-
-
-#class zeroDict (dict):
-	# declare the @ decorator just before the function, invokes print_timing()
-#	@get_timing
-#	def __getitem__(self, k):
-#		try:
-#			v = dict.__getitem__(self, k)
-#		except KeyError:
-#			return 0
-#		return v
-
-
-# The above way is my implementation... after searching google, I found this:
-# src: http://www.velocityreviews.com/forums/t641768-re-type-feedback-tool.html
-# Turns out this version is faster
-
 class zeroDict(dict):
 	'''
 	A class like a dict, but it overrides the ['key'] accessor (__getitem__)
