@@ -77,16 +77,16 @@ class resourceCollection():
 	links   = zeroDict()
 	emails  = zeroDict()
 
-class Spider (HTMLParser):
+class Spyder (HTMLParser):
 	'''
 	An HTML parser that spiders links and keeps track of resources found per page.
 	
-	Lists of resources per-spider/page and a global list (for all spiders/pages) are
+	Lists of resources per-spyder/page and a global list (for all spyders/pages) are
 	maintained.
 	'''
 	
 	def __init__(self, url, spanHosts=False, depthLimit=100, debug=False, globalResources=resourceCollection()):
-		super(Spider, self).__init__()
+		super(Spyder, self).__init__()
 		if debug:
 			print( "Constructor was called" )
 			print( "Spider Level Limit: ", depthLimit )
@@ -108,7 +108,7 @@ class Spider (HTMLParser):
 	
 	def readUrl (self):
 		'''
-		Read data from this spider object's url, and feeds the parser with it.
+		Read data from this spyder object's url, and feeds the parser with it.
 		
 		Handles content-type detection and decodes text data according to it.
 		Defaults to utf8 if no content-type is detected in header or page
@@ -155,7 +155,7 @@ class Spider (HTMLParser):
 		# Feed the parser with this page's data
 		self.feed(self.pageData)
 	
-	def spider (self, url):
+	def spyder (self, url):
 		'''
 		Recursively spider links
 		
@@ -165,7 +165,7 @@ class Spider (HTMLParser):
 		(target_scheme, target_netloc, target_path, target_query, target_fragment) = urlsplit(url)
 		(scheme, netloc, path, query, fragment) = urlsplit(self.url)
 		if self.__debug:
-			print ( '%-10s  %-70s   %-70s' % (' ', 'This Spider Target', 'Parent Spider Target') )
+			print ( '%-10s  %-70s   %-70s' % (' ', 'This Spyder Target', 'Parent Spyder Target') )
 			print ( '%-10s: %-70s   %-70s' % ( 'scheme',   target_scheme,   scheme  ) )
 			print ( '%-10s: %-70s   %-70s' % ( 'netloc',   target_netloc,   netloc  ) )
 			print ( '%-10s: %-70s   %-70s' % ( 'path',     target_path,     path    ) )
@@ -178,24 +178,24 @@ class Spider (HTMLParser):
 			return
 		elif not self.spanHosts and (target_netloc != netloc):
 			if self.__debug:
-				print( "Child link to spider does not match parent domain... skipping")
+				print( "Spyder link target does not match parent domain... skipping")
 			return
 		else:
 			if self.__debug:
 				print( "spidering: " + url )
 				print( "limit: ", self.depthLimit )
-			# Spawn a baby spider on the new url,
+			# Spawn a baby spyder on the new url,
 			# decrement the depthLimit,
 			# pass it the globalResources collection,
 			# and make it read & parse the page
-			a = Spider(url, self.spanHosts, self.depthLimit-1, self.__debug, self.globalResources)
+			a = Spyder(url, self.spanHosts, self.depthLimit-1, self.__debug, self.globalResources)
 			self.children.append( a )
 			a.readUrl()
 			a.close()
 	
 	def printResources(self):
 		'''
-		Function to print the resources found for this Spider object's page
+		Function to print the resources found for this Spyder object's page
 		'''
 		print ( '## Images: ' )
 		for k, v in images.items():  print( '%2d => %s' % (v, k) )
@@ -208,7 +208,7 @@ class Spider (HTMLParser):
 	
 	def printGlobalResources(self):
 		'''
-		Function to print the global resources collection for all Spider objects & pages
+		Function to print the global resources collection for all Spyder objects & pages
 		'''
 		for k, v in self.globalResources.images.items():  print( '%2d => %s' % (v, k) )
 		for k, v in self.globalResources.styles.items():  print( '%2d => %s' % (v, k) )
@@ -219,7 +219,7 @@ class Spider (HTMLParser):
 	def verifyGlobalResources(self):
 		'''
 		Function to test whether the global resources collection matches the sum of all
-		child Spider's localResources
+		child Spyder's localResources
 		'''
 		testResources = resourceCollection()
 		for baby in self.children:
@@ -242,7 +242,7 @@ class Spider (HTMLParser):
 		
 		This gets all images, stylesheets, scripts, and links on the page, 
 		and tracks the occurrences of unique resources.
-		Each resource occurrence is stored both in global & per-spider/page contexts
+		Each resource occurrence is stored both in global & per-spyder/page contexts
 		'''
 		arr = dict (attrs)
 		if tag=="img" and 'src' in arr:
@@ -262,7 +262,7 @@ class Spider (HTMLParser):
 			self.globalResources.scripts[src] += 1
 		elif tag=="a" and 'href' in arr:
 			href = urljoin (self.url, arr['href'])
-			# Spider all links below rooturl!
+			# Spyder all links below rooturl!
 			# Only follow the same link once, don't count anchor label links as unique
 			# (simply discard the fragment)
 			(scheme, netloc, path, query, fragment) = urlsplit(href)
@@ -277,7 +277,7 @@ class Spider (HTMLParser):
 				self.globalResources.emails[href] += 1
 			else:
 				if self.globalResources.links[href] == 0:
-					self.spider(href)
+					self.spyder(href)
 				else:
 					if self.__debug:
 						print('Already followed: ', href)
@@ -332,7 +332,7 @@ def main():
 		furl.close()
 		
 		# Parse the data
-		sp = Spider(furl.geturl(), True, options.level, options.debug)
+		sp = Spyder(furl.geturl(), True, options.level, options.debug)
 		sp.readUrl()
 		#url = "http://localhost:8080/Plone-test/sample-content/sitemap"
 		
