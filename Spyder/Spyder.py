@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
 # Get related documents: images, stylesheets, scripts
-import urllib
+import urllib.request
+import urllib.parse
 import optparse
 import sys
 import re
-import cgi
-import traceback
+#import traceback
 
-from urllib.parse import urljoin, urlsplit, urlunsplit
-from urllib.request import urlopen
-#from urllib.response import info
 from html.parser import HTMLParser
 
 # Function timing stuff
@@ -162,8 +159,8 @@ class Spyder (HTMLParser):
 		If depthLimit is <0, we treat this as an infinite depth limit
 		If spanHosts is True, links will not be checked against the parent host
 		'''
-		(target_scheme, target_netloc, target_path, target_query, target_fragment) = urlsplit(url)
-		(scheme, netloc, path, query, fragment) = urlsplit(self.url)
+		(target_scheme, target_netloc, target_path, target_query, target_fragment) = urllib.parse.urlsplit(url)
+		(scheme, netloc, path, query, fragment) = urllib.request.urlsplit(self.url)
 		if self.__debug:
 			print ( '%-10s  %-70s   %-70s' % (' ', 'This Spyder Target', 'Parent Spyder Target') )
 			print ( '%-10s: %-70s   %-70s' % ( 'scheme',   target_scheme,   scheme  ) )
@@ -247,28 +244,28 @@ class Spyder (HTMLParser):
 		arr = dict (attrs)
 		if tag=="img" and 'src' in arr:
 			# Images
-			src = urljoin (self.url, arr['src'])
+			src = urllib.request.urljoin( self.url, arr['src'] )
 			self.localResources.images[src]  += 1
 			self.globalResources.images[src] += 1
 		elif tag=="link" and arr["rel"]=="stylesheet" and 'src' in arr:
 			# Linked styslesheets
-			href = urljoin (self.url, arr['src'])
+			href = urllib.request.urljoin( self.url, arr['src'] )
 			self.localResources.styles[href]  += 1
 			self.globalResources.styles[href] += 1
 		elif tag=="script" and 'src' in arr:
 			# Linked scripts
-			src = urljoin (self.url, arr['src'])
+			src = urllib.request.urljoin( self.url, arr['src'] )
 			self.localResources.scripts[src]  += 1
 			self.globalResources.scripts[src] += 1
 		elif tag=="a" and 'href' in arr:
-			href = urljoin (self.url, arr['href'])
+			href = urllib.request.urljoin( self.url, arr['href'] )
 			# Spyder all links below rooturl!
 			# Only follow the same link once, don't count anchor label links as unique
 			# (simply discard the fragment)
-			(scheme, netloc, path, query, fragment) = urlsplit(href)
+			(scheme, netloc, path, query, fragment) = urllib.request.urlsplit(href)
 			if fragment and self.__debug:
 				print( "Discarding fragment: #", fragment)
-			href = urlunsplit( (scheme, netloc, path, query, '') )
+			href = urllib.parse.urlunsplit( (scheme, netloc, path, query, '') )
 			
 			# Handle mailto: links by adding them to resources
 			# Else, try to spider the link whatever scheme it is
@@ -291,7 +288,7 @@ class Spyder (HTMLParser):
 			# <style>@import url(...);</style>
 			text = self.lastdata.strip()
 			if text[:12] == "@import url(":
-				style = urljoin (self.url, text[12:-2])
+				style = urllib.request.urljoin( self.url, text[12:-2] )
 				self.localResources.styles[style]  += 1
 				self.globalResources.styles[style] += 1
 	
@@ -302,7 +299,7 @@ class Spyder (HTMLParser):
 def main():
 	usage = "usage: %prog -u http://www.example.com"
 	parser = optparse.OptionParser(usage)
-	parser.set_defaults( span_hosts=False, level=5, debug=False)
+	parser.set_defaults( span_hosts=False, level=5, debug=False )
 	parser.add_option("-u", "--url", dest="url", \
                     help="The url to start spidering from.")
 	parser.add_option("-d", "--debug", dest="debug", action="store_true", \
@@ -328,7 +325,7 @@ def main():
 			furl = urllib.request.urlopen(options.url)
 		except ValueError:
 			parser.error("Invalid url: %s" % options.url)
-		data = furl.read()
+		#data = furl.read()
 		furl.close()
 		
 		# Parse the data
@@ -352,4 +349,4 @@ def main():
 		sp.close()
 
 if __name__ == '__main__':
-  main()
+	main()

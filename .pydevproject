@@ -7,4 +7,7 @@
 <pydev_pathproperty name="org.python.pydev.PROJECT_SOURCE_PATH">
 <path>/www-benchmark/Spyder</path>
 </pydev_pathproperty>
+<pydev_pathproperty name="org.python.pydev.PROJECT_EXTERNAL_SOURCE_PATH">
+<path>/usr/lib/python3.1</path>
+</pydev_pathproperty>
 </pydev_project>
