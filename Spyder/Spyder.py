@@ -195,13 +195,13 @@ class Spyder (HTMLParser):
 		Function to print the resources found for this Spyder object's page
 		'''
 		print ( '## Images: ' )
-		for k, v in images.items():  print( '%2d => %s' % (v, k) )
+		for k, v in self.localResources.images.items():  print( '%2d => %s' % (v, k) )
 		print ( '## Stylesheets: ' )
-		for k, v in styles.items():  print( '%2d => %s' % (v, k) )
+		for k, v in self.localResources.styles.items():  print( '%2d => %s' % (v, k) )
 		print ( '## Scripts: ' )
-		for k, v in scripts.items(): print( '%2d => %s' % (v, k) )
+		for k, v in self.localResources.scripts.items(): print( '%2d => %s' % (v, k) )
 		print ( '## Links: ' )
-		for k, v in links.items():   print( '%2d => %s' % (v, k) )
+		for k, v in self.localResources.links.items():   print( '%2d => %s' % (v, k) )
 	
 	def printGlobalResources(self):
 		'''
