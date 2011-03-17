@@ -9,6 +9,16 @@ import re
 
 from html.parser import HTMLParser
 
+# TODO: Move this to some other class to handle the char detection stuff
+def _s2bytes(s):
+	# Convert a UTF-8 str to bytes if the interpreter is Python 3
+	try:
+		return bytes(s, 'utf8')
+	except (NameError, TypeError):
+		# In Python 2.5 and below, bytes doesn't exist (NameError)
+		# In Python 2.6 and above, bytes and str are the same (TypeError)
+		return s
+
 class zeroDict(dict):
 	'''
 	A class like a dict, but it overrides the ['key'] accessor (__getitem__)
@@ -97,22 +107,72 @@ class Spyder (HTMLParser):
 		#http_content_type, http_encoding = _parseHTTPContentType(http_headers.get('content-type', http_headers.get('Content-type')))
 		
 		headers = furl.info()
-		header_ctype = re.sub( '(?i).*charset=(.+)', '\\1', headers['content-type'] )
-		page_ctype = re.sub( b'(?i)meta\s+http-equiv="Content-Type"\s+content=".*charset=(.+)', b'\\1', self.pageData )
+		# Regex for capturing the charset from http headers
+		#content_type_str = ""
+		if headers['content-type']:
+			content_type_str = headers['content-type']
+		elif headers['Content-type']:
+			content_type_str = headers['Content-type']
+		header_ctype = re.search( '.*charset=(.*)', content_type_str, re.IGNORECASE )
+		# Regex for capturing the charset from a meta tag like this:
+		#<META http-equiv="Content-Type" content="text/html; charset=EUC-JP">
+		page_ctype = re.search( b'.*<meta\s+http-equiv="Content-Type"\s+content=".*?charset=(.+?)"\s*?/?>', self.pageData, re.IGNORECASE)
 		
-		encoding = headers.get_charset()
-		print( "##########################" )
-		print( "encoding: ", encoding)
-		print( "##########################" )
-		
-		print( 'header: ', header_ctype )
-		print( 'page: ', page_ctype )
+		if self.__debug:
+			print( "####################################################" )
+			print( "CHARACTER ENCODING DEBUG" )
+			print( 'header: ', header_ctype )
+			print( 'page: ', page_ctype )
+			if header_ctype:
+				print( "####################################################" )
+				print( 'header_match: ', header_ctype.group(0) )
+				print( 'header_ctype: ', header_ctype.group(1) )
+			if page_ctype:
+				print( "####################################################" )
+				print( 'page_match: ', page_ctype.group(0) )
+				print( 'page_ctype: ', page_ctype.group(1) )
+				print( "####################################################" )
 		if header_ctype:
-			self.pageData = self.pageData.decode( header_ctype )
+			self.pageData = self.pageData.decode( header_ctype.group(1) )
 		elif page_ctype:
-			self.pageData = self.pageData.decode( page_ctype )
+			if re.match( b'utf-8', page_ctype.group(1), re.IGNORECASE):
+				ctype = 'utf-8'
+			elif re.match( b'us-ascii', page_ctype.group(1), re.IGNORECASE):
+				ctype = 'us-ascii'
+			elif re.match( b'iso-8859-1', page_ctype.group(1), re.IGNORECASE):
+				ctype = 'iso-8859-1'
+			elif re.match( b'utf-16', page_ctype.group(1), re.IGNORECASE):
+				ctype = 'utf-16'
+			elif re.match( b'utf_16', page_ctype.group(1), re.IGNORECASE):
+				ctype = 'utf_16'
+			elif re.match( b'utf16', page_ctype.group(1), re.IGNORECASE):
+				ctype = 'utf16'
+			elif re.match( b'utf-32', page_ctype.group(1), re.IGNORECASE):
+				ctype = 'utf-32'
+			elif re.match( b'utf_32', page_ctype.group(1), re.IGNORECASE):
+				ctype = 'utf_32'
+			elif re.match( b'utf16', page_ctype.group(1), re.IGNORECASE):
+				ctype = 'utf16'
+			elif re.match( b'u16', page_ctype.group(1), re.IGNORECASE):
+				ctype = 'u16'
+			elif re.match( b'csunicode', page_ctype.group(1), re.IGNORECASE):
+				ctype = 'csunicode'
+			elif re.match( b'ucs-4', page_ctype.group(1), re.IGNORECASE):
+				ctype = 'ucs-4'
+			elif re.match( b'iso-10646-ucs-4', page_ctype.group(1), re.IGNORECASE):
+				ctype = 'iso-10646-ucs-4'
+			elif re.match( b'csucs4', page_ctype.group(1), re.IGNORECASE):
+				ctype = 'csucs4'
+			elif re.match( b'ucs-2', page_ctype.group(1), re.IGNORECASE):
+				ctype = 'ucs-2'
+			elif re.match( b'iso-10646-ucs-2', page_ctype.group(1), re.IGNORECASE):
+				ctype = 'iso-10646-ucs-2'
+			else:
+				ctype = 'utf-8'
+			
+			self.pageData = self.pageData.decode( ctype )
 		else:
-			self.pageData = self.pageData.decode( 'utf8' )
+			self.pageData = self.pageData.decode( 'utf-8' )
 		
 		# update url in case it redirected us
 		self.url = furl.geturl()
