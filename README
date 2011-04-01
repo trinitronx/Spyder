@@ -1,0 +1,41 @@
+Spyder - A simple spider written in python
+
+When called on a url, it will spider the pages and any links found up to the depth specified.
+After it's done, it will print a list of resources that it found.
+Currently, the resources it tries to find are:
+
+images   -  any images found on the page (ie: <img src="THIS"/>)
+styles   -  any external stylesheets found on the page.  CSS included via '@import' is currently only supported if within a style tag!
+            (ie: <link rel="stylesheet" src="THIS"/>  OR <style>@import url('THIS');</style> )
+scripts  -  any external scripts found in the page (ie: <script src="THIS"> )
+links    -  any urls found on the page.  'Fragments' are discarded. (ie: <a href="THIS#this-is-a-fragment"> )
+emails   -  any email addresses found on the page (ie: <a href="mailto:THIS"> )
+
+Internally, it uses html.parser.HTMLParser to parse pages, and both urllib.request, urllib.parse for making requests and doing url parsing.
+
+Usage: Spyder.py -u http://www.example.com
+
+Options:
+  -h, --help            show this help message and exit
+  -u URL, --url=URL     The url to start spidering from.
+  -d, --debug           Print debugging information (very verbose).
+  -l LEVEL, --level=LEVEL
+                        Specify recursion maximum depth level depth.  The
+                        default maximum depth is 5.
+  -H SPAN_HOSTS, --span-hosts=SPAN_HOSTS
+                        Enable spanning across hosts when spidering. The
+                        default is to limit spidering to one domain.
+  -F FILTER_HOSTS, --filter-hosts=FILTER_HOSTS
+                        After finished, filter the list of resources printed
+                        to the target domain. The default is to print ALL
+                        resources found.
+
+
+The original reason I made this was to do some url discovery for website benchmarking.
+An example script for doing something like this, 'www-benchmark.py', is included.  It uses apache benchmark as an example.
+Eventually I'll be experimenting with 'siege' for benchmarking & server stress-testing.
+
+
+NOTE: Currently the spider can throw exceptions in certain cases (mainly character encoding stuff, but there are probably other bugs too)
+      Getting *working* character encoding detection is a goal, and is sorta-working... ish?  Help in this area would be appreciated!
+      Filtering the results by domain is almost working too
