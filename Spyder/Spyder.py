@@ -367,6 +367,11 @@ def main():
 			parser.error("Invalid url: %s" % options.url)
 		#data = furl.read()
 		furl.close()
+
+		try:
+			options.level = int( options.level );
+		except:
+			parser.error("Invalid level: %s" % options.level)
 		
 		# Parse the data
 		sp = Spyder(furl.geturl(), options.span_hosts, options.level, options.debug)
