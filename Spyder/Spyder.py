@@ -201,22 +201,24 @@ class Spyder (HTMLParser):
 			if self.__debug:
 				print( "depth limit reached will go no further!" )
 			return
-		elif not self.spanHosts and (target_netloc != netloc):
+		print( "####################################################" )
+		print ("SPANHOSTS: ", self.spanHosts)
+		print( "####################################################" )
+		if not self.spanHosts and (target_netloc != netloc):
 			if self.__debug:
 				print( "Spyder link target does not match parent domain... skipping")
 			return
-		else:
-			if self.__debug:
-				print( "spidering: " + url )
-				print( "limit: ", self.depthLimit )
-			# Spawn a baby spyder on the new url,
-			# decrement the depthLimit,
-			# pass it the globalResources collection,
-			# and make it read & parse the page
-			a = Spyder(url, self.spanHosts, self.depthLimit-1, self.__debug, self.globalResources)
-			self.children.append( a )
-			a.readUrl()
-			a.close()
+		if self.__debug:
+			print( "spidering: " + url )
+			print( "limit: ", self.depthLimit )
+		# Spawn a baby spyder on the new url,
+		# decrement the depthLimit,
+		# pass it the globalResources collection,
+		# and make it read & parse the page
+		a = Spyder(url, self.spanHosts, self.depthLimit-1, self.__debug, self.globalResources)
+		self.children.append( a )
+		a.readUrl()
+		a.close()
 	
 	def printResources(self):
 		'''
@@ -231,10 +233,18 @@ class Spyder (HTMLParser):
 		print ( '## Links: ' )
 		for k, v in self.localResources.links.items():   print( '%2d => %s' % (v, k) )
 	
-	def printGlobalResources(self):
+	def printGlobalResources(self, filter_resources):
 		'''
 		Function to print the global resources collection for all Spyder objects & pages
 		'''
+		# Get the parent's domain
+		#(scheme, netloc, path, query, fragment) = urllib.request.urlsplit(self.url)
+		#if filter_resources:
+			#self.globalResources.images = { your_key: self.globalResources.images[your_key] for your_key in your_keys }
+			
+		#	for k, v in self.globalResources.images.items():
+		#		(res_scheme, res_netloc, res_path, res_query, res_fragment) = urllib.request.urlsplit(k)
+				
 		for k, v in self.globalResources.images.items():  print( '%2d => %s' % (v, k) )
 		for k, v in self.globalResources.styles.items():  print( '%2d => %s' % (v, k) )
 		for k, v in self.globalResources.scripts.items(): print( '%2d => %s' % (v, k) )
@@ -327,7 +337,7 @@ class Spyder (HTMLParser):
 def main():
 	usage = "usage: %prog -u http://www.example.com"
 	parser = optparse.OptionParser(usage)
-	parser.set_defaults( span_hosts=False, level=5, debug=False )
+	parser.set_defaults( span_hosts=False, level=5, debug=False, filter_hosts=False )
 	parser.add_option("-u", "--url", dest="url", \
                     help="The url to start spidering from.")
 	parser.add_option("-d", "--debug", dest="debug", action="store_true", \
@@ -336,6 +346,8 @@ def main():
                     help="Specify recursion maximum depth level depth.  The default maximum depth is 5.")
 	parser.add_option("-H", "--span-hosts", dest="span_hosts", \
                     help="Enable spanning across hosts when spidering. The default is to limit spidering to one domain.")
+	parser.add_option("-F", "--filter-hosts", dest="filter_hosts", \
+                    help="After finished, filter the list of resources printed to the target domain. The default is to print ALL resources found.")
 	
 	(options, args) = parser.parse_args()
 	
@@ -357,7 +369,7 @@ def main():
 		furl.close()
 		
 		# Parse the data
-		sp = Spyder(furl.geturl(), True, options.level, options.debug)
+		sp = Spyder(furl.geturl(), options.span_hosts, options.level, options.debug)
 		sp.readUrl()
 		#url = "http://localhost:8080/Plone-test/sample-content/sitemap"
 		
@@ -365,7 +377,7 @@ def main():
 		print( '###################  DONE SPIDERING  ###################\n')
 		print( furl.geturl() )
 		sp.verifyGlobalResources()
-		sp.printGlobalResources()
+		sp.printGlobalResources(options.filter_hosts)
 		#print( 'Runtime statistics: ' )
 		#for i in times: print ( '__getitem__ took %0.3f ms' % i )
 		#print( 'Number of executions: ', times.size )
