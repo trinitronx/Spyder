@@ -285,7 +285,7 @@ class Spyder (HTMLParser):
 			src = urllib.request.urljoin( self.url, arr['src'] )
 			self.localResources.images[src]  += 1
 			self.globalResources.images[src] += 1
-		elif tag=="link" and arr["rel"]=="stylesheet" and 'src' in arr:
+		elif tag=="link" and 'rel' in arr and arr["rel"]=="stylesheet" and 'src' in arr:
 			# Linked styslesheets
 			href = urllib.request.urljoin( self.url, arr['src'] )
 			self.localResources.styles[href]  += 1
