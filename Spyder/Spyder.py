@@ -60,7 +60,8 @@ class Spyder (HTMLParser):
 	maintained.
 	'''
 	
-	def __init__(self, url, spanHosts=False, depthLimit=100, debug=False, globalResources=resourceCollection()):
+	def __init__(self, url, spanHosts=False, depthLimit=100, debug=False, 
+		     globalResources=resourceCollection()):
 		super(Spyder, self).__init__()
 		if debug:
 			print( "Constructor was called" )
@@ -83,10 +84,12 @@ class Spyder (HTMLParser):
 	
 	def readUrl (self):
 		'''
-		Read data from this spyder object's url, and feeds the parser with it.
+		Read data from this spyder object's url, and feeds the parser 
+		with it.
 		
-		Handles content-type detection and decodes text data according to it.
-		Defaults to utf8 if no content-type is detected in header or page
+		Handles content-type detection and decodes text data according 
+		to it. Defaults to utf8 if no content-type is detected in header 
+		or page
 		'''
 		try:
 			furl = urllib.request.urlopen(self.url)
@@ -104,7 +107,8 @@ class Spyder (HTMLParser):
 		
 		#encoding = furl.headers.getparam('charset')
 		
-		#http_content_type, http_encoding = _parseHTTPContentType(http_headers.get('content-type', http_headers.get('Content-type')))
+		#http_content_type, http_encoding = _parseHTTPContentType(
+		#    http_headers.get('content-type', http_headers.get('Content-type')))
 		
 		headers = furl.info()
 		# Regex for capturing the charset from http headers
@@ -113,10 +117,12 @@ class Spyder (HTMLParser):
 			content_type_str = headers['content-type']
 		elif headers['Content-type']:
 			content_type_str = headers['Content-type']
-		header_ctype = re.search( '.*charset=(.*)', content_type_str, re.IGNORECASE )
+		header_ctype = re.search( '.*charset=(.*)', content_type_str, 
+					  re.IGNORECASE )
 		# Regex for capturing the charset from a meta tag like this:
 		#<META http-equiv="Content-Type" content="text/html; charset=EUC-JP">
-		page_ctype = re.search( b'.*<meta\s+http-equiv="Content-Type"\s+content=".*?charset=(.+?)"\s*?/?>', self.pageData, re.IGNORECASE)
+		page_ctype = re.search( b'.*<meta\s+http-equiv="Content-Type"\s+content=".*?charset=(.+?)"\s*?/?>', 
+					self.pageData, re.IGNORECASE)
 		
 		if self.__debug:
 			print( "####################################################" )
@@ -133,50 +139,69 @@ class Spyder (HTMLParser):
 				print( 'page_ctype: ', page_ctype.group(1) )
 				print( "####################################################" )
 		if header_ctype:
-			self.pageData = self.pageData.decode( header_ctype.group(1) )
+			self.pageData = self.pageData.decode( 
+				header_ctype.group(1) )
 		elif page_ctype:
-			if re.match( b'utf-8', page_ctype.group(1), re.IGNORECASE):
-				ctype = 'utf-8'
-			elif re.match( b'us-ascii', page_ctype.group(1), re.IGNORECASE):
-				ctype = 'us-ascii'
-			elif re.match( b'iso-8859-1', page_ctype.group(1), re.IGNORECASE):
-				ctype = 'iso-8859-1'
-			elif re.match( b'utf-16', page_ctype.group(1), re.IGNORECASE):
-				ctype = 'utf-16'
-			elif re.match( b'utf_16', page_ctype.group(1), re.IGNORECASE):
-				ctype = 'utf_16'
-			elif re.match( b'utf16', page_ctype.group(1), re.IGNORECASE):
-				ctype = 'utf16'
-			elif re.match( b'utf-32', page_ctype.group(1), re.IGNORECASE):
-				ctype = 'utf-32'
-			elif re.match( b'utf_32', page_ctype.group(1), re.IGNORECASE):
-				ctype = 'utf_32'
-			elif re.match( b'utf16', page_ctype.group(1), re.IGNORECASE):
-				ctype = 'utf16'
-			elif re.match( b'u16', page_ctype.group(1), re.IGNORECASE):
-				ctype = 'u16'
-			elif re.match( b'csunicode', page_ctype.group(1), re.IGNORECASE):
-				ctype = 'csunicode'
-			elif re.match( b'ucs-4', page_ctype.group(1), re.IGNORECASE):
-				ctype = 'ucs-4'
-			elif re.match( b'iso-10646-ucs-4', page_ctype.group(1), re.IGNORECASE):
-				ctype = 'iso-10646-ucs-4'
-			elif re.match( b'csucs4', page_ctype.group(1), re.IGNORECASE):
-				ctype = 'csucs4'
-			elif re.match( b'ucs-2', page_ctype.group(1), re.IGNORECASE):
-				ctype = 'ucs-2'
-			elif re.match( b'iso-10646-ucs-2', page_ctype.group(1), re.IGNORECASE):
-				ctype = 'iso-10646-ucs-2'
+			if re.match( b'utf-8', page_ctype.group(1), 
+				     re.IGNORECASE): ctype = 'utf-8'
+
+			elif re.match( b'us-ascii', page_ctype.group(1), 
+				       re.IGNORECASE): ctype = 'us-ascii'
+
+			elif re.match( b'iso-8859-1', page_ctype.group(1), 
+				       re.IGNORECASE): ctype = 'iso-8859-1'
+
+			elif re.match( b'utf-16', page_ctype.group(1), 
+				       re.IGNORECASE): ctype = 'utf-16'
+
+			elif re.match( b'utf_16', page_ctype.group(1), 
+				       re.IGNORECASE): ctype = 'utf_16'
+
+			elif re.match( b'utf16', page_ctype.group(1), 
+				       re.IGNORECASE): ctype = 'utf16'
+
+			elif re.match( b'utf-32', page_ctype.group(1), 
+				       re.IGNORECASE): ctype = 'utf-32'
+
+			elif re.match( b'utf_32', page_ctype.group(1), 
+				       re.IGNORECASE): ctype = 'utf_32'
+
+			elif re.match( b'utf16', page_ctype.group(1), 
+				       re.IGNORECASE): ctype = 'utf16'
+
+			elif re.match( b'u16', page_ctype.group(1), 
+				       re.IGNORECASE): ctype = 'u16'
+
+			elif re.match( b'csunicode', page_ctype.group(1), 
+				       re.IGNORECASE): ctype = 'csunicode'
+
+			elif re.match( b'ucs-4', page_ctype.group(1), 
+				       re.IGNORECASE): ctype = 'ucs-4'
+
+			elif re.match( b'iso-10646-ucs-4', page_ctype.group(1), 
+				       re.IGNORECASE): ctype = 'iso-10646-ucs-4'
+
+			elif re.match( b'csucs4', page_ctype.group(1), 
+				       re.IGNORECASE): ctype = 'csucs4'
+
+			elif re.match( b'ucs-2', page_ctype.group(1), 
+				       re.IGNORECASE): ctype = 'ucs-2'
+
+			elif re.match( b'iso-10646-ucs-2', page_ctype.group(1), 
+				       re.IGNORECASE): ctype = 'iso-10646-ucs-2'
+
 			else:
 				ctype = 'utf-8'
 			
 			self.pageData = self.pageData.decode( ctype )
+
 		else:
 			self.pageData = self.pageData.decode( 'utf-8' )
 		
 		# update url in case it redirected us
 		self.url = furl.geturl()
 		furl.close()
+
 		# Feed the parser with this page's data
 		self.feed(self.pageData)
 	
@@ -190,12 +215,18 @@ class Spyder (HTMLParser):
 		(target_scheme, target_netloc, target_path, target_query, target_fragment) = urllib.parse.urlsplit(url)
 		(scheme, netloc, path, query, fragment) = urllib.request.urlsplit(self.url)
 		if self.__debug:
-			print ( '%-10s  %-70s   %-70s' % (' ', 'This Spyder Target', 'Parent Spyder Target') )
-			print ( '%-10s: %-70s   %-70s' % ( 'scheme',   target_scheme,   scheme  ) )
-			print ( '%-10s: %-70s   %-70s' % ( 'netloc',   target_netloc,   netloc  ) )
-			print ( '%-10s: %-70s   %-70s' % ( 'path',     target_path,     path    ) )
-			print ( '%-10s: %-70s   %-70s' % ( 'query',    target_query,    query   ) )
-			print ( '%-10s: %-70s   %-70s' % ( 'fragment', target_fragment, fragment) )
+			print ( '%-10s  %-70s   %-70s' % 
+			    (' ', 'This Spyder Target', 'Parent Spyder Target'))
+			print ( '%-10s: %-70s   %-70s' % 
+                            ( 'scheme',   target_scheme,   scheme  ))
+			print ( '%-10s: %-70s   %-70s' % 
+                            ( 'netloc',   target_netloc,   netloc  ))
+			print ( '%-10s: %-70s   %-70s' % 
+                            ( 'path',     target_path,     path    ))
+			print ( '%-10s: %-70s   %-70s' % 
+			    ( 'query',    target_query,    query   ))
+			print ( '%-10s: %-70s   %-70s' % 
+			    ( 'fragment', target_fragment, fragment))
 		
 		if self.depthLimit == 0:
 			if self.__debug:
@@ -206,7 +237,8 @@ class Spyder (HTMLParser):
 		print( "####################################################" )
 		if not self.spanHosts and (target_netloc != netloc):
 			if self.__debug:
-				print( "Spyder link target does not match parent domain... skipping")
+				print( "Spyder link target does not match " +
+				       "parent domain... skipping")
 			return
 		if self.__debug:
 			print( "spidering: " + url )
@@ -225,11 +257,17 @@ class Spyder (HTMLParser):
 		Function to print the resources found for this Spyder object's page
 		'''
 		print ( '## Images: ' )
-		for k, v in self.localResources.images.items():  print( '%2d => %s' % (v, k) )
+		for k, v in self.localResources.images.items():  
+			print( '%2d => %s' % (v, k) )
+
 		print ( '## Stylesheets: ' )
-		for k, v in self.localResources.styles.items():  print( '%2d => %s' % (v, k) )
+		for k, v in self.localResources.styles.items():  
+			print( '%2d => %s' % (v, k) )
+
 		print ( '## Scripts: ' )
-		for k, v in self.localResources.scripts.items(): print( '%2d => %s' % (v, k) )
+		for k, v in self.localResources.scripts.items(): 
+			print( '%2d => %s' % (v, k) )
+
 		print ( '## Links: ' )
 		for k, v in self.localResources.links.items():   print( '%2d => %s' % (v, k) )
 	
@@ -241,15 +279,19 @@ class Spyder (HTMLParser):
 		#(scheme, netloc, path, query, fragment) = urllib.request.urlsplit(self.url)
 		#if filter_resources:
 			#self.globalResources.images = { your_key: self.globalResources.images[your_key] for your_key in your_keys }
-			
 		#	for k, v in self.globalResources.images.items():
 		#		(res_scheme, res_netloc, res_path, res_query, res_fragment) = urllib.request.urlsplit(k)
 				
-		for k, v in self.globalResources.images.items():  print( '%2d => %s' % (v, k) )
-		for k, v in self.globalResources.styles.items():  print( '%2d => %s' % (v, k) )
-		for k, v in self.globalResources.scripts.items(): print( '%2d => %s' % (v, k) )
-		for k, v in self.globalResources.emails.items():   print( '%2d => %s' % (v, k) )
-		for k, v in self.globalResources.links.items():   print( '%2d => %s' % (v, k) )
+		for k, v in self.globalResources.images.items():  
+			print( '%2d => %s' % (v, k) )
+		for k, v in self.globalResources.styles.items():  
+			print( '%2d => %s' % (v, k) )
+		for k, v in self.globalResources.scripts.items(): 
+			print( '%2d => %s' % (v, k) )
+		for k, v in self.globalResources.emails.items():   
+			print( '%2d => %s' % (v, k) )
+		for k, v in self.globalResources.links.items():   
+			print( '%2d => %s' % (v, k) )
 	
 	def verifyGlobalResources(self):
 		'''
@@ -258,18 +300,28 @@ class Spyder (HTMLParser):
 		'''
 		testResources = resourceCollection()
 		for baby in self.children:
-			for k, v in baby.localResources.images.items():  testResources.images[k]  += v
-			for k, v in baby.localResources.styles.items():  testResources.styles[k]  += v
-			for k, v in baby.localResources.scripts.items(): testResources.scripts[k] += v
-			for k, v in baby.localResources.emails.items():  testResources.emails[k]  += v
-			for k, v in baby.localResources.links.items():   testResources.links[k]   += v
+			for k, v in baby.localResources.images.items():  
+				testResources.images[k]  += v
+			for k, v in baby.localResources.styles.items():  
+				testResources.styles[k]  += v
+			for k, v in baby.localResources.scripts.items(): 
+				testResources.scripts[k] += v
+			for k, v in baby.localResources.emails.items():  
+				testResources.emails[k]  += v
+			for k, v in baby.localResources.links.items():   
+				testResources.links[k]   += v
 		
 		# Assert each resource has the same count
-		for k, v in self.globalResources.images.items():   assert( self.globalResources.images[k]  == testResources.images[k] )
-		for k, v in self.globalResources.styles.items():   assert( self.globalResources.styles[k]  == testResources.styles[k] )
-		for k, v in self.globalResources.scripts.items():  assert( self.globalResources.scripts[k] == testResources.scripts[k] )
-		for k, v in self.globalResources.emails.items():   assert( self.globalResources.emails[k]  == testResources.emails[k] )			
-		for k, v in self.globalResources.links.items():    assert( self.globalResources.links[k]   == testResources.links[k] )
+		for k, v in self.globalResources.images.items():   
+			assert( self.globalResources.images[k]  == testResources.images[k] )
+		for k, v in self.globalResources.styles.items():   
+			assert( self.globalResources.styles[k]  == testResources.styles[k] )
+		for k, v in self.globalResources.scripts.items():  
+			assert( self.globalResources.scripts[k] == testResources.scripts[k] )
+		for k, v in self.globalResources.emails.items():   
+			assert( self.globalResources.emails[k]  == testResources.emails[k] )			
+		for k, v in self.globalResources.links.items():    
+			assert( self.globalResources.links[k]   == testResources.links[k] )
 		
 	def handle_starttag (self, tag, attrs):
 		'''
